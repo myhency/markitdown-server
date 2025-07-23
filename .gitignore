@@ -1,0 +1,7 @@
+*.pdf
+*.pptx
+*.docx
+*.xlsx
+*.xls
+output.md
+/venv/*
