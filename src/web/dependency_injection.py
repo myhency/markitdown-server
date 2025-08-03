@@ -1,11 +1,11 @@
-from ..application.use_cases.convert_file import ConvertFileUseCase
-from ..application.use_cases.convert_image import ConvertImageUseCase
-from ..application.use_cases.convert_with_ai import ConvertWithAIUseCase
-from ..domain.services.markdown_enhancer import MarkdownEnhancerService
-from ..infrastructure.adapters.markitdown_adapter import MarkItDownAdapter, MarkItDownLLMAdapter
-from ..infrastructure.adapters.azure_openai_adapter import AzureOpenAIAdapter
-from ..infrastructure.adapters.image_converter_adapter import ImageConverterAdapter
-from ..infrastructure.adapters.file_storage_adapter import FileStorageAdapter
+from ..features.file_conversion.application.use_cases.convert_file import ConvertFileUseCase
+from ..features.image_conversion.application.use_cases.convert_image import ConvertImageUseCase
+from ..features.ai_conversion.application.use_cases.convert_with_ai import ConvertWithAIUseCase
+from ..features.file_conversion.domain.services.markdown_enhancer import MarkdownEnhancerService
+from ..features.file_conversion.infrastructure.adapters.markitdown_adapter import MarkItDownAdapter, MarkItDownLLMAdapter
+from ..features.image_conversion.infrastructure.adapters.azure_openai_adapter import AzureOpenAIAdapter
+from ..features.ai_conversion.infrastructure.adapters.image_converter_adapter import ImageConverterAdapter
+from ..features.file_conversion.infrastructure.adapters.file_storage_adapter import FileStorageAdapter
 
 
 class DependencyContainer:

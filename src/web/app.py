@@ -1,9 +1,9 @@
 from flask import Flask
-from ..infrastructure.config.settings import AppSettings
-from ..infrastructure.utils.logger import setup_logging
-from .controllers.file_conversion_controller import file_conversion_bp
-from .controllers.health_controller import health_bp
-from .controllers.error_handlers import register_error_handlers
+from ..shared.infrastructure.config.settings import AppSettings
+from ..shared.infrastructure.utils.logger import setup_logging
+from ..features.file_conversion.web.controllers.file_conversion_controller import file_conversion_bp
+from ..features.health.web.controllers.health_controller import health_bp
+from ..shared.web.common.error_handlers import register_error_handlers
 from .dependency_injection import DependencyContainer
 
 

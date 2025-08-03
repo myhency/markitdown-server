@@ -6,3 +6,10 @@
 output.md
 /venv/*
 *.log
+.claude
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so

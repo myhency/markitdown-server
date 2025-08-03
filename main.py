@@ -1,6 +1,6 @@
 from src.web.app import create_app
-from src.infrastructure.config.settings import AppSettings
-from src.infrastructure.utils.file_utils import SUPPORTED_EXTENSIONS
+from src.shared.infrastructure.config.settings import AppSettings
+from src.shared.infrastructure.utils.file_utils import SUPPORTED_EXTENSIONS
 
 
 def main():
