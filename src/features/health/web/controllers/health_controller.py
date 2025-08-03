@@ -30,7 +30,7 @@ def home():
             'convert_image': {
                 'method': 'POST',
                 'url': '/convert_image',
-                'description': 'Convert image to Markdown with AI-powered description',
+                'description': 'Convert image to Markdown with AI-powered description (Legacy)',
                 'parameters': {
                     'file': 'Image file to upload (required)',
                     'azure_endpoint': 'Azure OpenAI endpoint URL (required)',
@@ -40,6 +40,34 @@ def home():
                     'format': 'Response format: "json" or "text" (default: "json")',
                     'enhance_markdown': 'Enhance markdown structure: "true" or "false" (default: "true")'
                 }
+            },
+            'convert-image': {
+                'method': 'POST',
+                'url': '/convert-image',
+                'description': 'Convert image to Markdown with AI-powered description (REST API)',
+                'parameters': {
+                    'file': 'Image file to upload (required)',
+                    'azure_endpoint': 'Azure OpenAI endpoint URL (required)',
+                    'api_key': 'Azure OpenAI API key (required)',
+                    'deployment_name': 'Azure OpenAI deployment name (required)',
+                    'api_version': 'Azure OpenAI API version (default: "2024-02-01")',
+                    'enhance_markdown': 'Enhance markdown structure: "true" or "false" (default: "true")'
+                }
+            },
+            'convert-image/stream': {
+                'method': 'POST',
+                'url': '/convert-image/stream',
+                'description': 'Convert image to Markdown with real-time AI streaming (SSE)',
+                'parameters': {
+                    'file': 'Image file to upload (required)',
+                    'azure_endpoint': 'Azure OpenAI endpoint URL (required)',
+                    'api_key': 'Azure OpenAI API key (required)',
+                    'deployment_name': 'Azure OpenAI deployment name (required)',
+                    'api_version': 'Azure OpenAI API version (default: "2024-02-01")',
+                    'enhance_markdown': 'Enhance markdown structure: "true" or "false" (default: "true")'
+                },
+                'response_type': 'text/event-stream (Server-Sent Events)',
+                'events': ['connection', 'progress', 'ai_chunk', 'result', 'error']
             },
             'convert_with_ai': {
                 'method': 'POST',

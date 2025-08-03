@@ -14,11 +14,32 @@ SUPPORTED_EXTENSIONS = {
     '.msg'
 }
 
+IMAGE_EXTENSIONS = {
+    '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp'
+}
+
 
 def is_allowed_file(filename: str) -> bool:
     if not filename:
         return False
     return any(filename.lower().endswith(ext) for ext in SUPPORTED_EXTENSIONS)
+
+
+def is_image_file(filename: str) -> bool:
+    if not filename:
+        return False
+    extension = os.path.splitext(filename.lower())[1]
+    return extension in IMAGE_EXTENSIONS
+
+
+def get_file_extension(filename: str) -> str:
+    if not filename:
+        return ''
+    return os.path.splitext(filename.lower())[1]
+
+
+def allowed_file(filename: str) -> bool:
+    return is_allowed_file(filename)
 
 
 def get_file_info(filename: str) -> FileInfo:
