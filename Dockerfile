@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     tesseract-ocr-eng \
     tesseract-ocr-kor \
     ffmpeg \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # 작업 디렉토리 설정
@@ -20,7 +21,12 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 애플리케이션 코드 복사
-COPY server.py .
+COPY . .
+
+# 비root 사용자 생성 및 설정
+RUN useradd --create-home --shell /bin/bash app \
+    && chown -R app:app /app
+USER app
 
 # 포트 노출
 EXPOSE 5001
@@ -29,5 +35,5 @@ EXPOSE 5001
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:5001/health || exit 1
 
-# 애플리케이션 실행
-CMD ["python", "server.py"]
+# Gunicorn으로 애플리케이션 실행
+CMD ["gunicorn", "--config", "gunicorn.conf.py", "main:app"]
