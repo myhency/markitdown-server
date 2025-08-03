@@ -9,8 +9,12 @@ Microsoft의 MarkItDown 라이브러리를 사용하여 다양한 파일 형식�
 - [📁 지원하는 파일 형식](#-지원하는-파일-형식)
 - [🛠️ 설치 및 실행](#️-설치-및-실행)
 - [📖 API 사용법](#-api-사용법)
+- [⚡ Quick Start Examples](#-quick-start-examples)
 - [🐍 Python 클라이언트 예제](#-python-클라이언트-예제)
 - [📚 API Reference](#-api-reference)
+  - [📋 Endpoint Summary](#-endpoint-summary)
+  - [🔄 Feature Comparison](#-feature-comparison)
+  - [Detailed Endpoint Documentation](#detailed-endpoint-documentation)
 - [🔧 고급 설정](#-고급-설정)
 - [🧪 테스트](#-테스트)
 - [📝 에러 처리](#-에러-처리)
@@ -145,6 +149,87 @@ curl -N -X POST \
 - `ai_chunk`: 실시간 AI 응답 청크
 - `result`: 최종 결과
 - `error`: 오류 발생
+
+## ⚡ Quick Start Examples
+
+### 1. 서버 상태 확인
+```bash
+# 서버가 실행 중인지 확인
+curl http://localhost:5001/health
+
+# 지원하는 파일 형식과 모든 엔드포인트 정보 확인
+curl http://localhost:5001/
+```
+
+### 2. 간단한 파일 변환
+```bash
+# PDF를 마크다운으로 변환 (구조화 적용)
+curl -X POST \
+  -F "file=@example.pdf" \
+  http://localhost:5001/convert
+
+# 원본 텍스트만 변환 (구조화 없이)
+curl -X POST \
+  -F "file=@example.pdf" \
+  -F "enhance_markdown=false" \
+  http://localhost:5001/convert
+
+# 텍스트 파일로 응답받기
+curl -X POST \
+  -F "file=@example.pdf" \
+  -F "format=text" \
+  http://localhost:5001/convert
+```
+
+### 3. AI 이미지 분석 (Azure OpenAI 필요)
+```bash
+# 전통적인 REST API
+curl -X POST \
+  -F "file=@screenshot.png" \
+  -F "azure_endpoint=https://your-resource.openai.azure.com" \
+  -F "api_key=your-api-key" \
+  -F "deployment_name=gpt-4o" \
+  http://localhost:5001/convert-image
+
+# 실시간 스트리밍 (진행상황과 AI 응답을 실시간으로 확인)
+curl -N -X POST \
+  -F "file=@screenshot.png" \
+  -F "azure_endpoint=https://your-resource.openai.azure.com" \
+  -F "api_key=your-api-key" \
+  -F "deployment_name=gpt-4o" \
+  http://localhost:5001/convert-image/stream
+```
+
+### 4. AI 문서 분석 (Azure OpenAI 필요)
+```bash
+# 문서를 이미지로 변환한 후 AI로 분석
+curl -X POST \
+  -F "file=@presentation.pptx" \
+  -F "azure_endpoint=https://your-resource.openai.azure.com" \
+  -F "api_key=your-api-key" \
+  -F "deployment_name=gpt-4o" \
+  -F "dpi=300" \
+  http://localhost:5001/convert_with_ai
+
+# 실시간 스트리밍으로 각 페이지 분석 과정 확인
+curl -N -X POST \
+  -F "file=@presentation.pptx" \
+  -F "azure_endpoint=https://your-resource.openai.azure.com" \
+  -F "api_key=your-api-key" \
+  -F "deployment_name=gpt-4o" \
+  -F "dpi=300" \
+  http://localhost:5001/convert_with_ai/stream
+```
+
+### 5. 파일 타입별 최적 선택
+
+| 파일 타입 | 권장 엔드포인트 | 이유 |
+|----------|----------------|------|
+| **텍스트 파일** (`.txt`, `.csv`, `.json`) | `/convert` | 빠르고 정확한 일반 변환 |
+| **Office 문서** (`.docx`, `.pptx`, `.xlsx`) | `/convert` 또는 `/convert_with_ai` | 일반 변환으로 충분하나, 복잡한 레이아웃은 AI 분석 권장 |
+| **PDF** | `/convert` 또는 `/convert_with_ai` | 텍스트 기반 PDF는 일반 변환, 이미지/표 중심은 AI 분석 |
+| **이미지** (`.jpg`, `.png`) | `/convert-image` | 이미지 내용 분석 필요 |
+| **복잡한 문서** | `/convert_with_ai/stream` | 실시간 진행상황 확인 가능 |
 
 #### 원본 텍스트만 (마크다운 구조화 없이)
 
@@ -433,7 +518,33 @@ http://localhost:5001
 - No authentication required for basic file conversion
 - Azure OpenAI API key required for AI-powered features
 
+### 📋 Endpoint Summary
+
+| Endpoint | Method | Type | Description | AI Required |
+|----------|--------|------|-------------|-------------|
+| `/` | GET | Info | 서버 정보 및 지원 형식 조회 | ❌ |
+| `/health` | GET | Health | 서버 상태 확인 | ❌ |
+| `/convert` | POST | Conversion | 일반 파일을 마크다운으로 변환 | ❌ |
+| `/convert_image` | POST | AI Conversion | 이미지 AI 분석 (Legacy) | ✅ |
+| `/convert-image` | POST | AI Conversion | 이미지 AI 분석 (REST) | ✅ |
+| `/convert-image/stream` | POST | AI Streaming | 이미지 AI 분석 (SSE) | ✅ |
+| `/convert_with_ai` | POST | AI Conversion | 문서 AI 분석 | ✅ |
+| `/convert_with_ai/stream` | POST | AI Streaming | 문서 AI 분석 (SSE) | ✅ |
+
+### 🔄 Feature Comparison
+
+| Feature | Basic Conversion | Image AI | Document AI | Streaming |
+|---------|------------------|----------|-------------|-----------|
+| **Endpoints** | `/convert` | `/convert-image`<br>`/convert_image` | `/convert_with_ai` | `/convert-image/stream`<br>`/convert_with_ai/stream` |
+| **File Types** | All supported formats | Images only | Office docs + PDF | Same as non-streaming |
+| **AI Required** | ❌ | ✅ Azure OpenAI | ✅ Azure OpenAI | ✅ Azure OpenAI |
+| **Real-time Updates** | ❌ | ❌ | ❌ | ✅ SSE |
+| **Response Type** | JSON/Text | JSON | JSON/Text | Server-Sent Events |
+| **Use Case** | Fast file conversion | Image description | Document analysis | Real-time AI analysis |
+
 ---
+
+## Detailed Endpoint Documentation
 
 ### 1. GET `/`
 **서버 정보 및 지원 형식 조회**
@@ -656,8 +767,14 @@ data: {"status": "error", "message": "Error description"}
 | `deployment_name` | String | Yes | - | Azure OpenAI 배포 이름 |
 | `api_version` | String | No | `"2024-02-01"` | Azure OpenAI API 버전 |
 | `dpi` | String | No | `"200"` | PDF 변환 시 DPI 설정 |
-| `format` | String | No | `"json"` | 응답 형식 |
+| `format` | String | No | `"json"` | 응답 형식: `"json"` 또는 `"text"` |
 | `enhance_markdown` | String | No | `"true"` | 마크다운 구조 개선 여부 |
+
+#### Supported File Types
+- PDF: `.pdf`
+- PowerPoint: `.pptx`, `.ppt`
+- Word: `.docx`, `.doc`
+- Excel: `.xlsx`, `.xls`
 
 #### Request Example
 ```bash
@@ -675,17 +792,133 @@ curl -X POST \
 {
   "success": true,
   "markdown": "# 문서 분석 결과\n\n## 페이지 1\n...",
-  "original_markdown": "문서 분석 결과\n\n페이지 1\n...",
-  "title": "문서 분석 결과",
+  "file_info": {
+    "filename": "document.pdf",
+    "extension": ".pdf",
+    "mimetype": "application/pdf",
+    "supported": true
+  },
+  "processing_info": {
+    "enhanced": true,
+    "method": "ai_image_analysis",
+    "llm_model": "gpt-4o",
+    "azure_endpoint": "https://your-resource.openai.azure.com",
+    "dpi": 200
+  },
+  "analysis_results": [
+    {
+      "page": 1,
+      "status": "success",
+      "content_length": 156
+    }
+  ],
   "metadata": {
     "original_filename": "document.pdf",
+    "converted_size": 1456,
     "pages_processed": 3,
     "successful_pages": 3,
-    "failed_pages": 0,
-    "llm_used": true,
-    "llm_model": "gpt-4o"
+    "failed_pages": 0
   }
 }
+```
+
+---
+
+### 8. POST `/convert_with_ai/stream`
+**문서를 이미지로 변환한 후 AI로 분석 (SSE 스트리밍)**
+
+#### Parameters
+동일한 parameters를 `/convert_with_ai`와 동일하게 사용
+
+#### Request Example
+```bash
+curl -N -X POST \
+  -F "file=@document.pdf" \
+  -F "azure_endpoint=https://your-resource.openai.azure.com" \
+  -F "api_key=your-api-key" \
+  -F "deployment_name=gpt-4o" \
+  -F "dpi=200" \
+  http://localhost:5001/convert_with_ai/stream
+```
+
+#### Response (Server-Sent Events)
+
+##### Connection Event
+```
+event: connection
+data: {"status": "connected", "message": "Connection established"}
+```
+
+##### Progress Events
+```
+event: progress
+data: {"status": "processing", "message": "File uploaded successfully, starting AI conversion...", "filename": "document.pdf", "file_info": {...}}
+
+event: progress
+data: {"status": "processing", "message": "Converting .pdf document to images...", "step": "document_conversion"}
+
+event: progress
+data: {"status": "processing", "message": "Document converted to 3 images. Starting AI analysis...", "total_pages": 3, "step": "ai_processing_start"}
+
+event: progress
+data: {"status": "processing", "message": "Analyzing page 1 of 3...", "current_page": 1, "total_pages": 3, "step": "ai_page_processing"}
+```
+
+##### AI Streaming Events (per page)
+```
+event: ai_chunk
+data: {"status": "streaming", "message": "AI analyzing page 1...", "page": 1, "chunk": "# 페이지 1"}
+
+event: ai_chunk
+data: {"status": "streaming", "message": "AI analyzing page 1...", "page": 1, "chunk": "\n\n이 페이지는..."}
+```
+
+##### Page Completion Events
+```
+event: page_result
+data: {"status": "page_completed", "message": "Page 1 analysis completed", "page": 1, "content_length": 156, "progress": "1/3"}
+```
+
+##### Post-processing Event
+```
+event: progress
+data: {"status": "processing", "message": "All pages processed. Finalizing document...", "step": "post_processing", "pages_processed": 3, "successful_pages": 3, "failed_pages": 0}
+```
+
+##### Final Result Event
+```
+event: result
+data: {
+  "status": "completed",
+  "message": "AI conversion completed successfully",
+  "result": {
+    "success": true,
+    "markdown": "# 문서 분석 결과\n\n## 페이지 1\n...",
+    "file_info": {...},
+    "analysis_results": [...],
+    "metadata": {
+      "original_filename": "document.pdf",
+      "converted_size": 1456,
+      "pages_processed": 3,
+      "successful_pages": 3,
+      "failed_pages": 0,
+      "enhanced": true,
+      "method": "ai_image_analysis_streaming",
+      "llm_model": "gpt-4o",
+      "azure_endpoint": "https://your-resource.openai.azure.com",
+      "dpi": 200
+    }
+  }
+}
+```
+
+##### Error Events
+```
+event: error
+data: {"status": "error", "message": "Error description"}
+
+event: page_error
+data: {"status": "page_error", "message": "Failed to analyze page 2", "page": 2, "error": "Error details", "progress": "2/3"}
 ```
 
 ---
